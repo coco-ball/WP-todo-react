@@ -17,6 +17,7 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  orderBy,
 } from "firebase/firestore";
 
 // DB의 todos 컬렉션 참조를 만듭니다. 컬렉션 사용시 잘못된 컬렉션 이름 사용을 방지합니다.
@@ -29,13 +30,14 @@ const TodoList = () => {
   const [input, setInput] = useState("");
 
   const getTodos = async () => {
-    const q = query(todoCollection);
+    const q = query(todoCollection, orderBy("date"));
 
     const results = await getDocs(q);
     const newTodos = [];
 
     results.docs.forEach((doc) => {
       newTodos.push({ id: doc.id, ...doc.data() });
+      // console.log({ id: doc.id, ...doc.data() });
     });
 
     setTodos(newTodos);
@@ -56,12 +58,27 @@ const TodoList = () => {
     //   completed: 완료 여부,
     // }
     // ...todos => {id: 1, text: "할일1", completed: false}, {id: 2, text: "할일2", completed: false}}, ..
+    const timestamp = new Date();
+    const formattedDate = timestamp.toString().slice(4, 24);
+
     const docRef = await addDoc(todoCollection, {
       text: input,
       completed: false,
+      date: formattedDate,
     });
 
-    setTodos([...todos, { id: docRef.id, text: input, completed: false }]);
+    // console.log(formattedDate);
+    // console.log(todos[docRef.id]);
+
+    setTodos([
+      ...todos,
+      {
+        id: docRef.id,
+        text: input,
+        completed: false,
+        date: formattedDate,
+      },
+    ]);
     setInput("");
   };
 
@@ -97,9 +114,7 @@ const TodoList = () => {
   // 컴포넌트를 렌더링합니다.
   return (
     <div className={styles.container}>
-      <h1 className="text-xl mb-4 font-bold underline underline-offset-4 decoration-wavy">
-        Todo List
-      </h1>
+      <h1 className="text-xl mb-4 font-bold">🧉 Cocoball's Todo List 🧉</h1>
       {/* 할 일을 입력받는 텍스트 필드입니다. */}
       <input
         type="text"
@@ -115,7 +130,7 @@ const TodoList = () => {
         onChange={(e) => setInput(e.target.value)}
       />
       {/* 할 일을 추가하는 버튼입니다. */}
-      <div class="grid">
+      <div className="grid">
         <button
           // className={styles.addButton}
           // -- addButton CSS code --

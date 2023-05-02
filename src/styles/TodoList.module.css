@@ -35,5 +35,9 @@ button.addButton:hover {
 
 .todoText {
   margin-left: 10px;
-  flex-grow: 1;
+  width: 100%;
+}
+
+.delBtn {
+  cursor: pointer;
 }
