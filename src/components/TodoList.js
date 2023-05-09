@@ -71,14 +71,14 @@ const TodoList = () => {
     //   completed: 완료 여부,
     // }
     // ...todos => {id: 1, text: "할일1", completed: false}, {id: 2, text: "할일2", completed: false}}, ..
-    const timestamp = new Date();
-    const formattedDate = timestamp.toString().slice(4, 24);
+
+    const datetime = new Date().toISOString();
 
     const docRef = await addDoc(todoCollection, {
       userId: data?.user?.id,
       text: input,
       completed: false,
-      date: formattedDate,
+      datetime: datetime,
     });
 
     // console.log(formattedDate);
@@ -90,7 +90,7 @@ const TodoList = () => {
         id: docRef.id,
         text: input,
         completed: false,
-        date: formattedDate,
+        datetime: datetime,
       },
     ]);
     setInput("");
