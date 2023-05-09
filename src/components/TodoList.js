@@ -24,6 +24,7 @@ import {
 
 // DB의 todos 컬렉션 참조를 만듭니다. 컬렉션 사용시 잘못된 컬렉션 이름 사용을 방지합니다.
 const todoCollection = collection(db, "todos");
+// console.log(todoCollection);
 
 // TodoList 컴포넌트를 정의합니다.
 const TodoList = () => {
@@ -74,7 +75,7 @@ const TodoList = () => {
     const formattedDate = timestamp.toString().slice(4, 24);
 
     const docRef = await addDoc(todoCollection, {
-      userID: data?.user?.id,
+      userId: data?.user?.id,
       text: input,
       completed: false,
       date: formattedDate,

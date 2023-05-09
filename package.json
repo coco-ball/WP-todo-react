@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@next-auth/firebase-adapter": "^2.0.1",
     "firebase": "^9.21.0",
     "firebase-admin": "^11.8.0",
     "next": "13.3.0",
