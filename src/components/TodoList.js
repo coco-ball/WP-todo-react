@@ -6,6 +6,7 @@
 import React, { useEffect, useState } from "react";
 import TodoItem from "@/components/TodoItem";
 import styles from "@/styles/TodoList.module.css";
+import { useSession } from "next-auth/react";
 
 // firebase 관련 모듈을 불러옵니다.
 import { db } from "@/firebase";
@@ -18,6 +19,7 @@ import {
   updateDoc,
   deleteDoc,
   orderBy,
+  where,
 } from "firebase/firestore";
 
 // DB의 todos 컬렉션 참조를 만듭니다. 컬렉션 사용시 잘못된 컬렉션 이름 사용을 방지합니다.
@@ -29,9 +31,19 @@ const TodoList = () => {
   const [todos, setTodos] = useState([]);
   const [input, setInput] = useState("");
 
-  const getTodos = async () => {
-    const q = query(todoCollection, orderBy("date"));
+  const { data } = useSession();
 
+  const getTodos = async () => {
+    // const q = query(todoCollection, orderBy("date"));
+    if (!data?.user?.name) return;
+
+    const q = query(
+      todoCollection,
+      where("userId", "==", data?.user?.id),
+      orderBy("datetime", "asc")
+    );
+
+    // Firestore 에서 할 일 목록을 조회합니다.
     const results = await getDocs(q);
     const newTodos = [];
 
@@ -45,7 +57,7 @@ const TodoList = () => {
 
   useEffect(() => {
     getTodos();
-  }, []);
+  }, [data]);
 
   // addTodo 함수는 입력값을 이용하여 새로운 할 일을 목록에 추가하는 함수입니다.
   const addTodo = async () => {
@@ -62,6 +74,7 @@ const TodoList = () => {
     const formattedDate = timestamp.toString().slice(4, 24);
 
     const docRef = await addDoc(todoCollection, {
+      userID: data?.user?.id,
       text: input,
       completed: false,
       date: formattedDate,
@@ -114,7 +127,7 @@ const TodoList = () => {
   // 컴포넌트를 렌더링합니다.
   return (
     <div className={styles.container}>
-      <h1 className="text-xl mb-4 font-bold">🧉 Cocoball's Todo List 🧉</h1>
+      <h1 className="text-xl mb-4 font-bold">{data?.user?.name}'s Todo List</h1>
       {/* 할 일을 입력받는 텍스트 필드입니다. */}
       <input
         type="text"
